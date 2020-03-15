@@ -1,3 +1,6 @@
+#ifndef MARKOV_CHAIN_H
+#define MARKOV_CHAIN_H
+
 #include <iostream>
 #include <unordered_map>
 #include <vector>
@@ -12,12 +15,29 @@ class markovChain {
 	public:
 		markovChain(std::string fl) : file(fl) {}
 	
-		void makeMap() {
+		void process() { // adds the /BEGIN and /END to everything at the end
+			std::ofstream ofs;
+			ifs.open(file);
+			ofs.open("Processed" + file);
+
+			for (std::string line; std::getline(ifs, line);) {
+				line = "/BEGIN " + line + " /END\n";
+				ofs << line;
+			}
+			ifs.close();
+			ofs.close();
+		}
+
+		void makeMap(bool expectParsed = true) {
 			std::vector<std::string> info;
 			std::string input;
 			std::vector<std::string> sVec;
 	
-			ifs.open(file);
+			if (expectParsed)
+				ifs.open(file);
+			else
+				ifs.open("Processed" + file);
+
 			while (ifs >> input) info.push_back(input); // Placeholder vec for key search
 	
 			for (auto iter = info.begin(); iter != info.end(); ++iter) {
@@ -57,18 +77,4 @@ class markovChain {
 			}
 		}
 };
-
-int main() {
-	std::cout << "File name? (Don't include extension) ";
-	std::string userIn;
-	std::cin >> userIn;
-	markovChain sampleChain(userIn + ".txt");
-	sampleChain.makeMap();
-
-	while (true) {
-		std::cin.clear();
-		std::cin.ignore(99999,'\n');
-		std::cin;
-		std::cout << sampleChain.run() << '\n';
-	}
-}
+#endif
